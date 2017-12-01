@@ -18,7 +18,7 @@ app.get('/', (req, res) => {
     res.send('App is running.');
 });
 
-app.post('/', (req, res) => {
+app.post('/upload', (req, res) => {
     const boundingBoxes = req.body.boundingBoxes;
     const imageUrl = req.body.url;
     const promises = [];
