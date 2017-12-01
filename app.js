@@ -14,6 +14,10 @@ const server = app.listen(port, () => {
     console.log('App is listening on port %s', port);
 });
 
+app.get('/', (req, res) => {
+    res.send('App is running.');
+});
+
 app.post('/', (req, res) => {
     const boundingBoxes = req.body.boundingBoxes;
     const imageUrl = req.body.url;
