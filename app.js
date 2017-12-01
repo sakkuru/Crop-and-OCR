@@ -27,24 +27,28 @@ app.post('/', (req, res) => {
     if (!boundingBoxes || !imageUrl) return;
 
     boundingBoxes.forEach((box, no) => {
-        promises.push(cropImage(imageUrl, box, no).then(res => {
-            console.log('res', res)
-            return getOcrResult(res);
+        promises.push(cropImage(imageUrl, box, no).then(croppedImageName => {
+            console.log('cropped image:', croppedImageName);
+            return getOcrResult(croppedImageName);
         }));
     });
     Promise.all(promises).then(ocrRes => {
         res.send(ocrRes);
+        // removeFiles();
     });
 });
 
 const cropImage = (imageUrl, box, no) => {
-    const croppedFileName = `cropped_${no}_` + imageUrl.split('/').pop();
-    console.log(croppedFileName);
+    const croppedFileName = `images/cropped_${no}_` + imageUrl.split('/').pop();
+    console.log('croppedFileName', croppedFileName);
     return new Promise((resolve, reject) => {
         Jimp.read(imageUrl).then(image => {
-            image.crop(box.x, box.y, box.w, box.h)
+            return image.crop(box.x, box.y, box.w, box.h)
                 .write(croppedFileName);
-            resolve(__dirname + '/' + croppedFileName);
+        }).then(() => {
+            setTimeout(() => {
+                resolve(__dirname + '/' + croppedFileName);
+            }, 500);
         }).catch((err) => {
             console.error(err);
         });
@@ -59,7 +63,7 @@ const getOcrResult = (imageFileName) => {
             detectOrientation: true,
         };
         fs.readFile(imageFileName, (err, data) => {
-            console.log(data)
+            console.log('data', data);
             const options = {
                 url: apiEndpoint,
                 qs: params,
