@@ -56,7 +56,7 @@ app.post('/upload', (req, res) => {
 });
 
 const removeFile = fileName => {
-    fs.unlink(fileName, function(err) {});
+    fs.unlink(fileName, err => {});
 }
 
 const cropImage = (imageUrl, box, no) => {
