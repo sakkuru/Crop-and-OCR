@@ -15,15 +15,15 @@ const server = app.listen(port, () => {
 });
 
 app.get('/', (req, res) => {
-    const endPoint = req.protocol + '://' + req.headers.host + req.url;
-    let body = 'Post JSON to ' + endPoint + '/upload<br><br>';
+    const endPoint = req.protocol + '://' + req.headers.host;
+    let body = 'Post JSON as follows to ' + endPoint + '/upload<br><br>';
     const json = {
         "boundingBoxes": [
-            { "x": 20, "y": 20, "w": 300, "h": 100 },
+            { "x": 0, "y": 0, "w": 700, "h": 150 },
 
-            { "x": 20, "y": 20, "w": 100, "h": 100 }
+            { "x": 0, "y": 100, "w": 700, "h": 150 }
         ],
-        "url": "http://world-action.net/wp-content/uploads/2014/08/img_language.png"
+        "url": "https://sakkuru.github.io/Crop-and-OCR/sample_images/ibuse.png"
     }
     body += JSON.stringify(json);
     res.send(body);
