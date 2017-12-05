@@ -15,7 +15,18 @@ const server = app.listen(port, () => {
 });
 
 app.get('/', (req, res) => {
-    res.send('App is running.');
+    const endPoint = req.protocol + '://' + req.headers.host + req.url;
+    let body = 'Post JSON to ' + endPoint + '/upload<br><br>';
+    const json = {
+        "boundingBoxes": [
+            { "x": 20, "y": 20, "w": 300, "h": 100 },
+
+            { "x": 20, "y": 20, "w": 100, "h": 100 }
+        ],
+        "url": "http://world-action.net/wp-content/uploads/2014/08/img_language.png"
+    }
+    body += JSON.stringify(json);
+    res.send(body);
 });
 
 app.post('/upload', (req, res) => {
@@ -23,7 +34,6 @@ app.post('/upload', (req, res) => {
     const imageUrl = req.body.url;
     const promises = [];
 
-    console.log(imageUrl, boundingBoxes);
     if (!boundingBoxes || !imageUrl) return;
 
     boundingBoxes.forEach((box, no) => {
@@ -31,7 +41,6 @@ app.post('/upload', (req, res) => {
         promises.push(
             cropImage(imageUrl, box, no).then(imageName => {
                 croppedImageName = imageName;
-                console.log('cropped image:', croppedImageName);
                 return getOcrResult(croppedImageName);
             }).then(res => {
                 removeFile(croppedImageName);
@@ -46,13 +55,11 @@ app.post('/upload', (req, res) => {
 });
 
 const removeFile = fileName => {
-    console.log('remove ', fileName);
     fs.unlink(fileName, function(err) {});
 }
 
 const cropImage = (imageUrl, box, no) => {
     const croppedFileName = `images/cropped_${no}_` + imageUrl.split('/').pop();
-    console.log('croppedFileName', croppedFileName);
     return new Promise((resolve, reject) => {
         Jimp.read(imageUrl).then(image => {
             return image.crop(box.x, box.y, box.w, box.h)
@@ -75,7 +82,6 @@ const getOcrResult = (imageFileName) => {
             detectOrientation: true,
         };
         fs.readFile(imageFileName, (err, data) => {
-            console.log('data', data);
             const options = {
                 url: apiEndpoint,
                 qs: params,
@@ -91,7 +97,6 @@ const getOcrResult = (imageFileName) => {
                 if (error) {
                     console.log('Image Recognition Error: ', error);
                 } else {
-                    console.log('after ocr')
                     resolve(JSON.parse(body));
                 }
             });
