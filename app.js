@@ -27,16 +27,28 @@ app.post('/upload', (req, res) => {
     if (!boundingBoxes || !imageUrl) return;
 
     boundingBoxes.forEach((box, no) => {
-        promises.push(cropImage(imageUrl, box, no).then(croppedImageName => {
-            console.log('cropped image:', croppedImageName);
-            return getOcrResult(croppedImageName);
-        }));
+        let croppedImageName = '';
+        promises.push(
+            cropImage(imageUrl, box, no).then(imageName => {
+                croppedImageName = imageName;
+                console.log('cropped image:', croppedImageName);
+                return getOcrResult(croppedImageName);
+            }).then(res => {
+                removeFile(croppedImageName);
+                return res;
+            })
+        );
     });
+
     Promise.all(promises).then(ocrRes => {
         res.send(ocrRes);
-        // removeFiles();
     });
 });
+
+const removeFile = fileName => {
+    console.log('remove ', fileName);
+    fs.unlink(fileName, function(err) {});
+}
 
 const cropImage = (imageUrl, box, no) => {
     const croppedFileName = `images/cropped_${no}_` + imageUrl.split('/').pop();
@@ -79,6 +91,7 @@ const getOcrResult = (imageFileName) => {
                 if (error) {
                     console.log('Image Recognition Error: ', error);
                 } else {
+                    console.log('after ocr')
                     resolve(JSON.parse(body));
                 }
             });
