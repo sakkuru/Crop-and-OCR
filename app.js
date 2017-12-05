@@ -23,9 +23,10 @@ app.get('/', (req, res) => {
 
             { "x": 0, "y": 100, "w": 700, "h": 150 }
         ],
-        "url": "https://sakkuru.github.io/Crop-and-OCR/sample_images/ibuse.png"
+        "url": "https://sakkuru.github.io/Trim-and-OCR/sample_images/ibuse.png"
     }
     body += JSON.stringify(json);
+
     res.send(body);
 });
 
